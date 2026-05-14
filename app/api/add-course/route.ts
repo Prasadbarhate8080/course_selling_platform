@@ -5,7 +5,7 @@ import { getServerSession, User} from "next-auth";
 import { connectToDatabase } from "@/lib/dbConnect";
 import { success } from "zod";
 
-export async function POST(request: NextRequest,response: NextResponse) {
+export async function POST(request: NextRequest) {
     try {
         await connectToDatabase();
         let { title, description,price,thumbnailUrl } = await request.json();
