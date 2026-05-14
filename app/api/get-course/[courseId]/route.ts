@@ -10,7 +10,7 @@ export async function GET(request:NextRequest,context:{params:Promise<{courseId:
         let session = await getServerSession(authOptions);
         console.log("session",session)
         let { courseId } = await context.params;
-        if (!session || (session.user as User).role !== "admin") {
+        if (!session) {
             return NextResponse.json(
                 {
                     success: false,
