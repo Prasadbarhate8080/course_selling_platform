@@ -65,23 +65,28 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks:{
         async signIn({ user, account, profile }) {
+            if (!user || !user.email) return false;
+            
             if (account?.provider === "google" || account?.provider === "github") {
                 await connectToDatabase();
                 try {
-                    const existingUser = await userModel.findOne({ email: user.email });
-                    if (!existingUser) {
-                        const newUser = await userModel.create({
+                    let dbUser = await userModel.findOne({ email: user.email });
+                    
+                    if (!dbUser) {
+                        const baseName = user.name || user.email.split("@")[0];
+                        dbUser = await userModel.create({
                             email: user.email,
-                            userName: user.name?.split(" ").join("").toLowerCase() + Math.floor(Math.random() * 1000),
+                            userName: baseName.split(" ").join("").toLowerCase() + Math.floor(Math.random() * 1000),
                             isVerified: true,
                             role: "user", // Default role for new OAuth users
                         });
-                        user._id = newUser._id.toString();
-                        user.role = newUser.role;
-                    } else {
-                        user._id = existingUser._id.toString();
-                        user.role = existingUser.role;
                     }
+
+                    const userId = (dbUser._id as any).toString();
+                    user._id = userId;
+                    user.id = userId;
+                    user.role = dbUser.role;
+                    
                     return true;
                 } catch (error) {
                     console.error("Error during OAuth sign-in sync:", error);
