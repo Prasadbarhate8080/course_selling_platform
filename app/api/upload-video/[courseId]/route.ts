@@ -6,24 +6,28 @@ import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/dbConnect";
 import { videoProcessingQueue } from "@/lib/queue";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request:NextRequest,context: { params: Promise<{ courseId: string }> })
 {
     try {
         await connectToDatabase()
+        console.log("request came on the upload video")
         let body = await request.json();
         let {courseId} = await context.params;
         console.log("courseId",courseId)
         const session = await getServerSession(authOptions);
-        if (!session || (session.user as User).role !== "admin") {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: "unauthorized request"
-                },
-                { status: 401 }
-            )
-        }
-        const admin = session.user as User;
+        const admin:User = session?.user as User
+        // if(!session && admin?.role !== "admin")
+        // {
+        //     return NextResponse.json(
+        //         {
+        //             success:false,
+        //             message:"unauthorized request"  
+        //         },
+        //         {status:401}
+        //     )
+        // }
         let {videoUrl,title,description,thumbnailUrl,videoUploadTopic,uploadId} = body;
 
         if(!videoUrl && !title && !description) return NextResponse.json({

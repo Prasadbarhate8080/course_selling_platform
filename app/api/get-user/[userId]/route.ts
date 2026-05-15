@@ -2,6 +2,8 @@ import { connectToDatabase } from "@/lib/dbConnect";
 import { userModel } from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request:NextRequest,context: { params: Promise<{ userId: string }> }){
     try {
         await connectToDatabase()

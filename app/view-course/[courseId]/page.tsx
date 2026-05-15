@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import Script from "next/script";
 import axios from "axios";
 import { userService } from "@/services/userService";
-import { fetchData } from "next-auth/client/_utils";
 
 interface CourseData {
   _id: string;

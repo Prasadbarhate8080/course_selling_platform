@@ -4,6 +4,8 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import { courseModel } from "@/models/course.model";
 import { connectToDatabase } from "@/lib/dbConnect";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(
   request: NextRequest,
   context: { params: Promise<{ courseId: string }> }

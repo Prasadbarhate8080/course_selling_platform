@@ -6,6 +6,8 @@ import { reviewsModel } from "@/models/reviews.model";
 import { courseModel } from "@/models/course.model";
 import { connectToDatabase } from "@/lib/dbConnect";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request:Request, context: { params: Promise<{ courseId: string }> })
 {
     try {

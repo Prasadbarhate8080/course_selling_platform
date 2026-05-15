@@ -6,6 +6,8 @@ import { paymentModel } from "@/models/payment.model";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Razorpay Order Creation API
  * This API creates a unique Order ID from Razorpay and saves a pending payment record in our DB.
