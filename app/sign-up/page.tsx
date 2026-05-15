@@ -18,8 +18,10 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { apiError } from "@/types/apiError"
+import { useRouter } from "next/navigation"
 
 function page() {
+    const router = useRouter();
     const form = useForm<z.infer<typeof signUpSchema>>(
         {
             resolver:zodResolver(signUpSchema),
@@ -34,6 +36,7 @@ function page() {
         try {
             const response = await axios.post("/api/sign-up",data)
             toast.success(response.data.message)
+            router.replace(`/verify/${data.userName}`)
         } catch (error) {
             const axiosError = error as AxiosError<apiError>;
             toast.error(axiosError.response?.data.message)

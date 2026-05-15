@@ -56,7 +56,7 @@ function page() {
             <h2 className="text-3xl font-bold text-center">Welcome To SkillPeak</h2>
             <div className="flex gap-4 w-fit mx-auto">
                 <Button className="bg-white text-gray-800 border hover:bg-white hover:cursor-pointer"
-                onClick={() => {signIn("google")}}
+                onClick={() => {signIn("google", { callbackUrl: "/" })}}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="200" height="200" viewBox="0 0 48 48">
                         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,
@@ -70,7 +70,7 @@ function page() {
                         5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
                         </svg> Continue with Google</Button>
                 <Button className="bg-white text-gray-800 border hover:bg-white hover:cursor-pointer"
-                onClick={() => {signIn("github")}}
+                onClick={() => {signIn("github", { callbackUrl: "/" })}}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="200" height="200" viewBox="0 0 30 30">
                         <path d="M15,3C8.373,3,3,8.373,3,15c0,5.623,3.872,10.328,9.092,11.63C12.036,26.468,12,26.28,12,26.047v-2.051

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { courseModel } from "@/models/course.model";
 import { reviewsModel } from "@/models/reviews.model";
+import { courseModel } from "@/models/course.model";
 import { userModel } from "@/models/user.model";
 import { connectToDatabase } from "@/lib/dbConnect";
 
@@ -26,9 +26,11 @@ export async function GET(
             .select("title description price thumbnailUrl reviews")
             .populate({
                 path: "reviews",
+                model: reviewsModel, // Explicitly provide the model
                 select: "rating comment user",
                 populate: {
                     path: "user",
+                    model: userModel, // Explicitly provide the model
                     select: "userName"
                 }
             });
