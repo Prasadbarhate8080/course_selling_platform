@@ -4,7 +4,6 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import { courseModel, videoModel } from "@/models/course.model";
 import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/dbConnect";
-import { videoProcessingQueue } from "@/lib/queue";
 
 export const dynamic = 'force-dynamic';
 
