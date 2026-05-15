@@ -128,7 +128,14 @@ const page = () => {
     const fetchCourse = async () => {
       try {
         setLoading(true);
-        const response = await courseServices.getCourse(courseId);
+        // If not purchased, fetch only preview data
+        let response;
+        if (!isPurchased) {
+          response = await courseServices.getCoursePreview(courseId);
+        } else {
+          response = await courseServices.getCourse(courseId);
+        }
+
         if (!response?.success || !response.data) {
           setError(response?.message || "Unable to load course.");
           return;
@@ -146,7 +153,7 @@ const page = () => {
     if (courseId) {
       fetchCourse();
     }
-  }, [courseId]);
+  }, [courseId, isPurchased]);
 
   if (loading) {
     return (
@@ -296,10 +303,14 @@ const page = () => {
               </Button>
             </div>
 
-            {course.courseStructure.length === 0 ? (
+            {!course.courseStructure || course.courseStructure.length === 0 ? (
               <Card className="border-dashed border-2">
                 <CardContent className="py-12 text-center">
-                  <p className="text-muted-foreground">No topics have been added to this course yet.</p>
+                  <p className="text-muted-foreground">
+                    {!course.courseStructure 
+                      ? "Course curriculum is available after purchase." 
+                      : "No topics have been added to this course yet."}
+                  </p>
                 </CardContent>
               </Card>
             ) : (

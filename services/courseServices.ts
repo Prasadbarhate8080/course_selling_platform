@@ -24,6 +24,11 @@ class CourseServices{
             method:"GET",
         })
     }
+    async getCoursePreview(courseId:string) {
+        return fetch<apiResponse<any>>(`/get-course-preview/${courseId}`,{
+            method:"GET",
+        })
+    }
     async getCourses() {
         return fetch<apiResponse<Course[]>>(`/get-courses`,{
             method:"GET",

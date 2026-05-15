@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/options";
 import { courseModel } from "@/models/course.model";
 import { connectToDatabase } from "@/lib/dbConnect";
 
