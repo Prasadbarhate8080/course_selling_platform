@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { courseModel } from "@/models/course.model";
+import { reviewsModel } from "@/models/reviews.model";
+import { userModel } from "@/models/user.model";
 import { connectToDatabase } from "@/lib/dbConnect";
 
 export const dynamic = 'force-dynamic';
