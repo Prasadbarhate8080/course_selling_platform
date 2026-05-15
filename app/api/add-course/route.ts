@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { getServerSession, User} from "next-auth";
 import { connectToDatabase } from "@/lib/dbConnect";
-import { success } from "zod";
 
 export async function POST(request: NextRequest) {
     try {

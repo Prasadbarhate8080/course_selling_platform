@@ -1,6 +1,6 @@
 import { CourseStructureItem } from "@/types/courseStructure";
 import { fetch } from "./fetchData";
-import { Course, Video } from "@/models/course.model";
+import { Video } from "@/models/course.model";
 import { apiResponse } from "@/types/apiResponse";
 
 export type videoDataType = Omit<Video, "_id">

@@ -10,7 +10,6 @@ export async function POST(request:NextRequest,context: { params: Promise<{ cour
 {
     try {
         await connectToDatabase()
-        console.log("request came on the upload video")
         let body = await request.json();
         let {courseId} = await context.params;
         console.log("courseId",courseId)

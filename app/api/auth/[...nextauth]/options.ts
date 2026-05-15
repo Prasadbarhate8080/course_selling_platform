@@ -37,7 +37,7 @@ export const authOptions: NextAuthOptions = {
                         if(!account?.isVerified)
                             throw new Error("please verify your account before logging in")
                         if(!account)
-                            throw new Error("invalid c  redentials")
+                            throw new Error("invalid credentials")
                         const isPasswordCorrect = await bcrypt.compare(
                             credentials.password,
                             account?.password
@@ -64,8 +64,42 @@ export const authOptions: NextAuthOptions = {
         
     ],
     callbacks:{
+        async signIn({ user, account, profile }) {
+            if (account?.provider === "google" || account?.provider === "github") {
+                await connectToDatabase();
+                try {
+                    const existingUser = await userModel.findOne({ email: user.email });
+                    if (!existingUser) {
+                        const newUser = await userModel.create({
+                            email: user.email,
+                            userName: user.name?.split(" ").join("").toLowerCase() + Math.floor(Math.random() * 1000),
+                            isVerified: true,
+                            role: "user", // Default role for new OAuth users
+                        });
+                        user._id = newUser._id.toString();
+                        user.role = newUser.role;
+                    } else {
+                        user._id = existingUser._id.toString();
+                        user.role = existingUser.role;
+                    }
+                    return true;
+                } catch (error) {
+                    console.error("Error during OAuth sign-in sync:", error);
+                    return false;
+                }
+            }
+            return true;
+        },
         async jwt({ token, user }) {
-        // Always fetch the latest user data from DB to ensure role is up to date
+        // 1. If this is the initial sign-in, user will be defined
+        if (user) {
+          token._id = user._id?.toString();
+          token.isVerified = user.isVerified;
+          token.userName = user.userName;
+          token.role = user.role;
+        } 
+        
+        // 2. Always fetch the latest data from DB if we have an ID
         if (token._id) {
           await connectToDatabase();
           const dbUser = await userModel.findById(token._id);
@@ -74,13 +108,8 @@ export const authOptions: NextAuthOptions = {
             token.userName = dbUser.userName;
             token.isVerified = dbUser.isVerified;
           }
-        } else if (user) {
-          // This only runs on the very first sign in call
-          token._id = user._id?.toString();
-          token.isVerified = user.isVerified;
-          token.userName = user.userName;
-          token.role = user.role;
         }
+        
         return token;
       },
       async session({ session, token }) {

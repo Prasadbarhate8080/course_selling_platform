@@ -10,6 +10,8 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import Script from "next/script";
 import axios from "axios";
+import { userService } from "@/services/userService";
+import { fetchData } from "next-auth/client/_utils";
 
 interface CourseData {
   _id: string;
@@ -28,15 +30,15 @@ const page = () => {
   const [course, setCourse] = useState<CourseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedTopics, setExpandedTopics] = useState<number[]>([]);
-
   const toggleTopic = (index: number) => {
     setExpandedTopics((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
-
+  
   const handleBuyNow = async () => {
     try {
       if (!session) {
@@ -102,6 +104,26 @@ const page = () => {
       setBuying(false);
     }
   };
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (session?.user?._id) {
+        try {
+          const response = await userService.getUser(session.user._id);
+          if (response.success && response.data?.courses) {
+            const purchased = response.data.courses.some(
+              (id: any) => id.toString() === courseId
+            );
+            setIsPurchased(purchased);
+          }
+        } catch (err) {
+          console.error("Failed to fetch user data", err);
+        }
+      }
+    };
+    fetchUser();
+  }, [session, courseId]);
+  
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -210,13 +232,16 @@ const page = () => {
               </div>
               
               <div className="bg-card text-card-foreground p-6 rounded-3xl shadow-xl border space-y-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">₹{course.price}</span>
-                  <span className="text-muted-foreground line-through">₹{course.price * 2}</span>
-                  <span className="text-green-600 font-semibold">50% off</span>
-                </div>
+                {!isPurchased && (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-bold">₹{course.price}</span>
+                    <span className="text-muted-foreground line-through">₹{course.price * 2}</span>
+                    <span className="text-green-600 font-semibold">50% off</span>
+                  </div>
+                )}
+                
                 <Button 
-                  onClick={handleBuyNow}
+                  onClick={isPurchased ? () => router.push(`/view-course/${courseId}`) : handleBuyNow}
                   disabled={buying}
                   className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20"
                 >
@@ -225,11 +250,16 @@ const page = () => {
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Processing...
                     </>
+                  ) : isPurchased ? (
+                    "View Course"
                   ) : (
                     "Buy Now"
                   )}
                 </Button>
-                <p className="text-center text-xs text-muted-foreground">30-Day Money-Back Guarantee</p>
+
+                {!isPurchased && (
+                  <p className="text-center text-xs text-muted-foreground">30-Day Money-Back Guarantee</p>
+                )}
                 
                 <div className="space-y-3 pt-4 border-t">
                   <p className="font-semibold text-sm">This course includes:</p>
@@ -307,15 +337,15 @@ const page = () => {
                               key={lecture._id ?? lectureIndex}
                               className="flex items-center gap-4 p-4 rounded-xl transition-all hover:bg-primary/5 group"
                             >
-                              <div className="flex-shrink-0">
+                              <div className="shrink-0">
                                 <Video className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                               </div>
-                              <div className="flex-grow min-w-0">
+                              <div className="grow min-w-0">
                                 <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
                                   {lecture.video?.title ?? `Lecture ${lectureIndex + 1}`}
                                 </p>
                               </div>
-                              <div className="flex-shrink-0 flex items-center gap-2">
+                              <div className="shrink-0 flex items-center gap-2">
                                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-2 py-0.5 bg-muted rounded">Video</span>
                               </div>
                             </div>

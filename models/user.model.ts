@@ -29,15 +29,12 @@ const userSchema:Schema<User> = new mongoose.Schema(
         },
         password:{
             type:String,
-            required:[true, "password id required"],
         },
         verifyCode:{
             type:String,
-            required: [true, "verifycode id required"]
         },
         verifyCodeExpiry:{
             type:Date,
-            required: [true, "verifyCode expiry is required"]
         },
         isVerified:{
             type:Boolean,
