@@ -7,7 +7,7 @@ export interface Video extends Document {
   thumbnailUrl: string;
   controls?: boolean;
   uploadId?: string;
-  status?: "uploading" | "completed" | "faild"  | "processing" | "uploaded",
+  status?: "uploading" | "completed" | "failed"  | "processing" | "uploaded",
   transformation?: {
     height: number;
     width: number;

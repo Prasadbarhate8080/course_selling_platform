@@ -121,3 +121,54 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Video.js Dark Theme Customization */
+.video-player-container .video-js {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: transparent;
+}
+
+.video-player-container .vjs-big-play-button {
+  background-color: rgba(59, 130, 246, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 2.5em;
+  height: 2.5em;
+  line-height: 2.5em;
+  top: 50%;
+  left: 50%;
+  margin-top: -1.25em;
+  margin-left: -1.25em;
+  transition: all 0.2s ease;
+}
+
+.video-player-container .video-js:hover .vjs-big-play-button {
+  background-color: rgb(59, 130, 246);
+  transform: scale(1.1);
+}
+
+.video-player-container .vjs-control-bar {
+  background-color: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
+  height: 4em;
+}
+
+.video-player-container .vjs-slider {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.video-player-container .vjs-play-progress,
+.video-player-container .vjs-volume-level {
+  background-color: #3b82f6;
+}
+
+.video-player-container .vjs-load-progress {
+  background-color: rgba(255, 255, 255, 0.2);
+}

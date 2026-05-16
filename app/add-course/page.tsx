@@ -75,7 +75,7 @@ function page() {
         isPrivateFile: false,
         useUniqueFileName: true,
       });
-      if (!thumbnailUploadResponse.url) return toast("thumbnail upload faild");
+      if (!thumbnailUploadResponse.url) return toast("thumbnail upload failed");
       console.log(thumbnailUploadResponse);
       data.thumbnailUrl = thumbnailUploadResponse.url;
       const response = await axios.post("/api/add-course", data);

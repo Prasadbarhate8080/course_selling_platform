@@ -37,14 +37,71 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-4 mb-10">
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
-            Explore Courses
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-slate-950 py-20 sm:py-32">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/20 blur-[120px]"></div>
+        <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-blue-600/20 blur-[120px]"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6 animate-fade-in">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            Industrial Grade Learning
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight mb-8">
+            Master <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Full Stack Java</span> & Modern Coding
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            Learn from the best industry experts and level up your skills today.
+          
+          <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+            From Core Java to Advanced Microservices. Learn the exact skills used by top-tier engineers at Google, Amazon, and Microsoft.
           </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button size="lg" className="h-14 px-8 text-lg font-bold rounded-2xl shadow-lg shadow-primary/25 w-full sm:w-auto" onClick={() => {
+              const element = document.getElementById('courses');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}>
+              Browse Courses
+            </Button>
+            <Button variant="outline" size="lg" className="h-14 px-8 text-lg font-semibold rounded-2xl border-slate-800 text-slate-300 hover:bg-slate-900 w-full sm:w-auto">
+              Success Stories
+            </Button>
+          </div>
+
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-slate-800/50 pt-12">
+            <div>
+              <p className="text-3xl font-bold text-white">10k+</p>
+              <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-1">Students</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-white">4.9/5</p>
+              <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-1">Avg Rating</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-white">24/7</p>
+              <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-1">Support</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-white">Life-time</p>
+              <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-1">Access</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="courses" className="max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 mb-12">
+          <div className="flex items-center gap-3">
+            <div className="h-1 w-12 bg-primary rounded-full"></div>
+            <h2 className="text-sm font-bold text-primary uppercase tracking-widest">Our Catalog</h2>
+          </div>
+          <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+            Pick your next challenge
+          </h3>
         </div>
 
         {loading ? (

@@ -5,7 +5,7 @@ import { courseServices } from "@/services/courseServices";
 import { CourseStructureItem } from "@/types/courseStructure";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Loader2, X, Star, Clock, Users, User, CheckCircle2, ChevronDown, ChevronUp, Video } from "lucide-react";
+import { Loader2, X, Star, Clock, Users, User, CheckCircle2, ChevronDown, ChevronUp, Video, Edit } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import Script from "next/script";
@@ -247,7 +247,7 @@ const page = () => {
                 )}
                 
                 <Button 
-                  onClick={isPurchased ? () => router.push(`/view-course/${courseId}`) : handleBuyNow}
+                  onClick={isPurchased ? () => router.push(`/learn/${courseId}`) : handleBuyNow}
                   disabled={buying}
                   className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20"
                 >
@@ -262,6 +262,17 @@ const page = () => {
                     "Buy Now"
                   )}
                 </Button>
+
+                {session?.user?.role === "admin" && (
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push(`/add-course/add-topics-videos/${courseId}`)}
+                    className="w-full h-12 border-dashed border-2 hover:bg-primary/5 hover:text-primary transition-all"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Update Course
+                  </Button>
+                )}
 
                 {!isPurchased && (
                   <p className="text-center text-xs text-muted-foreground">30-Day Money-Back Guarantee</p>
