@@ -31,17 +31,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
 
     const event = JSON.parse(rawBody);
-    console.log("uploadId:", event.data.id);
+    console.log("Mux Event Type:", event.type);
+    
+    // In Mux, for direct uploads, the upload_id is usually in event.data.upload_id 
+    // or sometimes event.data.id depending on the event type.
+    const uploadId = event.data.upload_id || event.data.id;
+    console.log("Detected Upload ID from Mux:", uploadId);
 
     if (event.type === "video.asset.ready") {
       const playbackId = event.data.playback_ids?.[0]?.id;
+      const assetId = event.data.id; // This is the Asset ID
 
-      console.log("VIDEO READY:", playbackId);
-      let video = await videoModel.findOne({ uploadId: event.data.upload_id });
-      if (!video) return NextResponse.json({ error: "Video not found" }, { status: 404 });
+      console.log("VIDEO ASSET READY:", { playbackId, assetId, uploadId });
+      
+      // Try to find the video by uploadId
+      let video = await videoModel.findOne({ uploadId: uploadId });
+      
+      if (!video) {
+        console.error("CRITICAL: Video not found in DB for uploadId:", uploadId);
+        return NextResponse.json({ error: "Video not found" }, { status: 404 });
+      }
+
+      console.log("Updating Video in DB:", video._id);
       video.videoUrl = `https://stream.mux.com/${playbackId}.m3u8`;
       video.status = "completed";
       await video.save();
+      console.log("Video successfully updated with new URL:", video.videoUrl);
     }
     return NextResponse.json({ received: true });
   } catch (error) {
