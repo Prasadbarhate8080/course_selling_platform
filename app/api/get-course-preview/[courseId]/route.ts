@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { reviewsModel } from "@/models/reviews.model";
-import { courseModel } from "@/models/course.model";
+import { courseModel, videoModel } from "@/models/course.model";
 import { userModel } from "@/models/user.model";
 import { connectToDatabase } from "@/lib/dbConnect";
 
@@ -12,6 +12,10 @@ export async function GET(
 ) {
     try {
         await connectToDatabase();
+        
+        // Ensure models are registered
+        if (!videoModel) console.log("videoModel not found");
+
         const { courseId } = await context.params;
 
         if (!courseId) {
@@ -23,17 +27,22 @@ export async function GET(
 
         // Fetch only necessary details for preview
         const course = await courseModel.findById(courseId)
-            .select("title description price thumbnailUrl reviews")
+            .select("title description price thumbnailUrl reviews courseStructure")
+            .populate({
+                path: "courseStructure.lectures.video",
+                model: videoModel,
+                select: "title" // ONLY title, no URLs or other sensitive info
+            })
             .populate({
                 path: "reviews",
-                model: reviewsModel, // Explicitly provide the model
+                model: reviewsModel,
                 select: "rating comment user",
                 populate: {
                     path: "user",
-                    model: userModel, // Explicitly provide the model
+                    model: userModel,
                     select: "userName"
                 }
-            });
+            }).lean();
 
         if (!course) {
             return NextResponse.json(
@@ -48,7 +57,8 @@ export async function GET(
             description: course.description,
             price: course.price,
             thumbnailUrl: course.thumbnailUrl,
-            reviews: course.reviews
+            reviews: course.reviews,
+            courseStructure: course.courseStructure
         };
 
         return NextResponse.json(
