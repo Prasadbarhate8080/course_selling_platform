@@ -135,23 +135,42 @@
   background-color: transparent;
 }
 
+/* Big Play Button Customization */
 .video-player-container .vjs-big-play-button {
-  background-color: rgba(59, 130, 246, 0.8);
-  border: none;
-  border-radius: 50%;
-  width: 2.5em;
-  height: 2.5em;
-  line-height: 2.5em;
-  top: 50%;
-  left: 50%;
-  margin-top: -1.25em;
-  margin-left: -1.25em;
-  transition: all 0.2s ease;
+  background-color: rgba(59, 130, 246, 0.8) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 2.5em !important;
+  height: 2.5em !important;
+  line-height: 2.5em !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  transition: all 0.2s ease !important;
+  z-index: 2;
+}
+
+/* Show big play button when paused */
+.video-player-container .vjs-paused .vjs-big-play-button {
+  display: block !important;
+}
+
+/* Hide big play button when playing */
+.video-player-container .vjs-playing .vjs-big-play-button {
+  display: none !important;
+}
+
+/* Ensure the big play button icon is also centered */
+.video-player-container .vjs-big-play-button .vjs-icon-placeholder:before {
+  font-size: 1.6em;
+  line-height: 1.5;
 }
 
 .video-player-container .video-js:hover .vjs-big-play-button {
-  background-color: rgb(59, 130, 246);
-  transform: scale(1.1);
+  background-color: rgb(59, 130, 246) !important;
+  transform: translate(-50%, -50%) scale(1.1) !important;
 }
 
 .video-player-container .vjs-control-bar {

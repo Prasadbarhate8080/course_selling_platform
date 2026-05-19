@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { courseServices } from "@/services/courseServices";
 import { userService } from "@/services/userService";
@@ -57,7 +57,7 @@ const LearnPage = () => {
   const [course, setCourse] = useState<CourseData | null>(null);
   const [currentVideo, setCurrentVideo] = useState<VideoData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isPurchased, setIsPurchased] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [completedVideos, setCompletedVideos] = useState<string[]>([]);
   const [expandedTopics, setExpandedTopics] = useState<string[]>([]);
@@ -74,33 +74,40 @@ const LearnPage = () => {
 
       try {
         setLoading(true);
-        // 1. Check if user purchased the course
-        const userRes = await userService.getUser(session.user._id);
-        const purchased = userRes.data?.courses?.some(
+        
+        // 1. Fetch course details and user data in parallel
+        const [courseRes, userRes] = await Promise.all([
+          courseServices.getCourse(courseId),
+          userService.getUser(session.user._id)
+        ]);
+
+        if (!courseRes.success || !courseRes.data) {
+          toast.error("Failed to load course content.");
+          router.push("/dashboard");
+          return;
+        }
+
+        const courseData = courseRes.data as any;
+        
+        // 2. Check if user is admin OR purchased the course
+        const isPurchased = userRes.data?.courses?.some(
           (id: any) => id.toString() === courseId
         );
+        const isAdmin = courseData.admin?.toString() === session.user._id;
 
-        if (!purchased) {
-          toast.error("You haven't purchased this course yet.");
+        if (!isPurchased && !isAdmin) {
+          toast.error("You don't have access to this course.");
           router.push(`/view-course/${courseId}`);
           return;
         }
 
-        setIsPurchased(true);
-
-        // 2. Fetch full course details
-        const courseRes = await courseServices.getCourse(courseId);
-        if (courseRes.success && courseRes.data) {
-          const courseData = courseRes.data as unknown as CourseData;
-          setCourse(courseData);
-          
-          // Set initial video if none selected
-          if (courseData.courseStructure.length > 0 && courseData.courseStructure[0].lectures.length > 0) {
-            setCurrentVideo(courseData.courseStructure[0].lectures[0].video);
-            setExpandedTopics([courseData.courseStructure[0]._id]);
-          }
-        } else {
-          toast.error("Failed to load course content.");
+        setHasAccess(true);
+        setCourse(courseData as unknown as CourseData);
+        
+        // Set initial video if none selected
+        if (courseData.courseStructure.length > 0 && courseData.courseStructure[0].lectures.length > 0) {
+          setCurrentVideo(courseData.courseStructure[0].lectures[0].video);
+          setExpandedTopics([courseData.courseStructure[0]._id]);
         }
       } catch (err) {
         console.error("Error loading learn page:", err);
@@ -155,6 +162,29 @@ const LearnPage = () => {
     return null;
   };
 
+  // Memoize player options to prevent unnecessary re-renders of the VideoJS component
+  const playerOptions = useMemo(() => {
+    if (!currentVideo) return null;
+    
+    return {
+      autoplay: false,
+      controls: true,
+      responsive: true,
+      fluid: true,
+      aspectRatio: '16:9',
+      preload: 'auto',
+      poster: currentVideo.thumbnailUrl,
+      sources: [
+        {
+          src: currentVideo.videoUrl,
+          type: (currentVideo.videoUrl.includes("stream.mux.com") || currentVideo.videoUrl.endsWith(".m3u8"))
+            ? "application/x-mpegURL" 
+            : "video/mp4",
+        },
+      ],
+    };
+  }, [currentVideo?.videoUrl, currentVideo?.thumbnailUrl]);
+
   if (loading || status === "loading") {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-950">
@@ -163,7 +193,7 @@ const LearnPage = () => {
     );
   }
 
-  if (!isPurchased || !course) return null;
+  if (!hasAccess || !course) return null;
 
   const totalLectures = course.courseStructure.reduce((acc, topic) => acc + topic.lectures.length, 0);
   const nextVideo = getNextVideo();
@@ -289,11 +319,10 @@ const LearnPage = () => {
         </div>
 
         {/* Video Player Container */}
-        <div className="flex-1 flex flex-col overflow-y-auto scrollbar-none">
-          <div className="w-full bg-black aspect-video lg:aspect-auto lg:flex-1 relative group">
+        <div className="flex-1 flex flex-col overflow-y-auto scrollbar-none items-center">
+          <div className="w-full max-w-[1600px] bg-black aspect-video relative group shadow-2xl">
             {currentVideo ? (
-              // If it's a Mux video and not yet completed, show processing UI
-              (currentVideo.videoUrl.includes("stream.mux.com") && currentVideo.status !== "completed") || 
+              // Show processing UI only if status is strictly "processing" or "uploading"
               currentVideo.status === "processing" || 
               currentVideo.status === "uploading" ? (
                 <div className="flex h-full flex-col items-center justify-center space-y-4 bg-slate-900 text-slate-400">
@@ -304,28 +333,15 @@ const LearnPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="h-full w-full video-player-container">
-                  <VideoJS
-                    key={currentVideo.videoUrl}
-                    options={{
-                      autoplay: false,
-                      controls: true,
-                      responsive: true,
-                      fluid: true,
-                      poster: currentVideo.thumbnailUrl,
-                      sources: [
-                        {
-                          src: currentVideo.videoUrl,
-                          type: (currentVideo.videoUrl.includes("stream.mux.com") || currentVideo.videoUrl.endsWith(".m3u8"))
-                            ? "application/x-mpegURL" 
-                            : "video/mp4",
-                        },
-                      ],
-                    }}
-                    onReady={(player: any) => {
-                      console.log("Player is ready");
-                    }}
-                  />
+                <div className="h-full w-full">
+                  {playerOptions && (
+                    <VideoJS
+                      options={playerOptions}
+                      onReady={(player: any) => {
+                        console.log("Player is ready");
+                      }}
+                    />
+                  )}
                 </div>
               )
             ) : (

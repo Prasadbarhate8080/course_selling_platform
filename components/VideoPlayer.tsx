@@ -16,34 +16,30 @@ export const VideoJS = (props: { options: any; onReady?: any; }) => {
         if (!playerRef.current) {
          // The Video.js player needs to be inside the component element for React 18 Strict Mode. 
             const placeholderEl = placeholderRef.current;
-            const videoElement = placeholderEl.appendChild(
-                document.createElement("video-js")
-            );
+            const videoElement = document.createElement("video");
+            videoElement.classList.add("video-js", "vjs-big-play-centered");
+            videoElement.setAttribute("playsinline", "true");
+            placeholderEl.appendChild(videoElement);
 
-            const player: any = videojs(videoElement, options, () => {
-                player.log("player is ready");
+            const player: any = playerRef.current = videojs(videoElement, {
+                ...options,
+                userActions: {
+                    click: true,
+                    doubleClick: true
+                }
+            }, () => {
                 onReady && onReady(player);
             });
 
-            // Toggle play/pause on click
-            player.on("click", () => {
-                if (player.paused()) {
-                    player.play();
-                } else {
-                    player.pause();
-                }
-            });
-
-            playerRef.current = player
-
             // Binding to the source selector plugin in Video.js
-            player.httpSourceSelector();
-
-            // You can update player in the `else` block here, for example:
+            if (player.httpSourceSelector) {
+                player.httpSourceSelector();
+            }
         } else {
             const player = playerRef.current;
             player.autoplay(options.autoplay);
             player.src(options.sources);
+            player.poster(options.poster);
         }
 
     }, [options, onReady]);
